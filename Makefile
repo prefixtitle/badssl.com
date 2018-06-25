@@ -38,8 +38,8 @@ certs-test:
 	rm -rf common/certs/*.crt
 	cp certs/sets/current/gen/crt/ca-root.crt common/certs
 	cp certs/sets/current/gen/crt/ca-untrusted-root.crt common/certs
-	cp certs/sets/current/gen/crt/client.p12 common/certs/${TEST_DOMAIN}-client.p12
-	cp certs/sets/current/gen/crt/client.pem common/certs/${TEST_DOMAIN}-client.pem
+	cp certs/sets/current/gen/crt/client-local.p12 common/certs/${TEST_DOMAIN}-client-local.p12
+	cp certs/sets/current/gen/crt/client-local.pem common/certs/${TEST_DOMAIN}-client-local.pem
 
 .PHONY: certs-prod
 certs-prod:
@@ -48,8 +48,8 @@ certs-prod:
 
 	rm -rf common/certs/*.crt
 	cp certs/sets/current/gen/crt/ca-untrusted-root.crt common/certs
-	cp certs/sets/current/gen/crt/client.p12 common/certs/${PROD_DOMAIN}-client.p12
-	cp certs/sets/current/gen/crt/client.pem common/certs/${PROD_DOMAIN}-client.pem
+	cp certs/sets/current/gen/crt/client-prod.p12 common/certs/${PROD_DOMAIN}-client-prod.p12
+	cp certs/sets/current/gen/crt/client-prod.pem common/certs/${PROD_DOMAIN}-client-prod.pem
 
 .PHONY: clean-certs
 clean-certs:
