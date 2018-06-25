@@ -63,17 +63,36 @@ $(O)/gen/chain/client-ca-untrusted-root.pem: $(O)/gen/crt/client-ca-untrusted-ro
 	./tool chain $@ $(D) $^
 CHAINS_PROD += $(O)/gen/chain/client-ca-untrusted-root.pem
 
-$(O)/gen/key/client.key:
-	./tool gen-key $@ $(D) 2048
-$(O)/gen/csr/client.csr: src/conf/client.conf $(O)/gen/key/client.key
+$(O)/gen/key/client-ca-intermediate.key:
+	./tool gen-key $@ $(D) 4096
+$(O)/gen/csr/client-ca-intermediate.csr: src/conf/client-ca-intermediate.conf $(O)/gen/key/client-ca-intermediate.key
 	./tool gen-csr $@ $(D) $^
-$(O)/gen/crt/client.crt: src/conf/client.conf $(O)/gen/csr/client.csr $(O)/gen/key/client-ca-root.key $(O)/gen/crt/client-ca-root.crt
+$(O)/gen/crt/client-ca-intermediate.crt: src/conf/client-ca-intermediate.conf $(O)/gen/csr/client-ca-intermediate.csr $(O)/gen/key/client-ca-root.key $(O)/gen/crt/client-ca-root.crt
+	./tool sign $@ $(D) $(SIGN_CA_DEFAULTS) $^
+
+$(O)/gen/key/client-local.key:
+	./tool gen-key $@ $(D) 2048
+$(O)/gen/csr/client-local.csr: src/conf/client-local.conf $(O)/gen/key/client-local.key
+	./tool gen-csr $@ $(D) $^
+$(O)/gen/crt/client-local.crt: src/conf/client-local.conf $(O)/gen/csr/client-local.csr $(O)/gen/key/client-ca-intermediate.key $(O)/gen/crt/client-ca-intermediate.crt
 	./tool sign $@ $(D) $(SIGN_LEAF_DEFAULTS) $^
-$(O)/gen/crt/client.p12: $(O)/gen/crt/client.crt $(O)/gen/key/client.key
+$(O)/gen/crt/client-local.p12: $(O)/gen/crt/client-local.crt $(O)/gen/key/client-local.key
 	./tool gen-pkcs12-p12 $@ $(D) $^
-$(O)/gen/crt/client.pem: $(O)/gen/crt/client.p12
+$(O)/gen/crt/client-local.pem: $(O)/gen/crt/client-local.p12
 	./tool pkcs12-convert-p12-pem $@ $(D) $^
-CHAINS_PROD += $(O)/gen/crt/client.pem
+CHAINS_LOCAL_ONLY += $(O)/gen/crt/client-local.pem
+
+$(O)/gen/key/client-prod.key:
+	./tool gen-key $@ $(D) 2048
+$(O)/gen/csr/client-prod.csr: src/conf/client-prod.conf $(O)/gen/key/client-prod.key
+	./tool gen-csr $@ $(D) $^
+$(O)/gen/crt/client-prod.crt: src/conf/client-prod.conf $(O)/gen/csr/client-prod.csr $(O)/gen/key/client-ca-intermediate.key $(O)/gen/crt/client-ca-intermediate.crt
+	./tool sign $@ $(D) $(SIGN_LEAF_DEFAULTS) $^
+$(O)/gen/crt/client-prod.p12: $(O)/gen/crt/client-prod.crt $(O)/gen/key/client-prod.key
+	./tool gen-pkcs12-p12 $@ $(D) $^
+$(O)/gen/crt/client-prod.pem: $(O)/gen/crt/client-prod.p12
+	./tool pkcs12-convert-p12-pem $@ $(D) $^
+CHAINS_PROD += $(O)/gen/crt/client-prod.pem
 
 ################################
 $(O)/gen/key/ca-untrusted-root.key:
